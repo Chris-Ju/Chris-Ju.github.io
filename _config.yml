@@ -13,8 +13,6 @@ twitter_username: ChrisKingJu
 github_username:  Chris-Ju
 weibo_username:  鞠擘
 
-# Google-analytics
-google-analytics:
-  id: ""
+
 
 exclude: ['package.json', 'src' , 'node_modules']
