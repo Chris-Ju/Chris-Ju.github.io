@@ -98,4 +98,12 @@ service-worker: true
 
 # Friends
 friends: [
+  {
+    title: "韦阳",
+    href: "https://godweiyang.com"
+  },
+  {
+    title: "瓜皮",
+    href: "https://www.gofun4.top"
+  }
 ]
