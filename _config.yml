@@ -99,6 +99,10 @@ service-worker: true
 # Friends
 friends: [
   {
+    title: "梅子酒天下第一",
+    href: "https://otakekumi.github.io/"
+  },
+  {
     title: "韦阳",
     href: "https://godweiyang.com"
   },
