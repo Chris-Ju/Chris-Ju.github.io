@@ -1,7 +1,7 @@
 ---
 layout:     post                    # 使用的布局（不需要改）
 title:      JarvisOJ-WEB-Writeup    # 标题
-subtitle:   日就完事了               #副标题
+subtitle:   一只 web 狗在成长        #副标题
 date:       2018-09-15              # 时间
 author:     RTL                     # 作者
 header-img: img/post-bg-hacker.jpg  #这篇文章标题背景图片
