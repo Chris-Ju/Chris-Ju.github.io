@@ -215,3 +215,22 @@ for i in xrange(1000):
     print ret
     break
 ```
+
+## Chopper
+
+- 题目环境配置有问题
+
+## Easy Gallery
+
+- 上传图片完毕后，使用 view 查看，发现了 src ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-1.png?raw=true) ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-2.png?raw=true)
+
+- 那如何可以将其解析为 php 呢？查看 url 发现了问题 ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-3.png?raw=true)
+- 猜测可以在图片中加上 php 代码 ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-4.png?raw=true)
+- 发现被过滤了？ ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-5.png?raw=true)
+- 谷歌寻找了一下方法，构造 payload 
+
+```html
+<script language="php">@eval(system('ls'));</script>
+```
+
+- 得到 flag ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-6.png?raw=true)
