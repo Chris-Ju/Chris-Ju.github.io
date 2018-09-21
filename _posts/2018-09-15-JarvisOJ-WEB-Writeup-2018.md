@@ -245,3 +245,16 @@ python sqlmap.py -u http://web.jarvisoj.com:32787/login.php --data="username=adm
 
 - 得到后 md5 解密 334cfb59c9d74849801d5acdcfdaadc3 -> eTAloCrEP
 - ![simpleinjection](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-SimpleInjection.png?raw=true)
+
+## api 调用
+
+- 分析一波源码，感觉可以 XEE 注入 ![api](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-API.png?raw=true)
+- 直接得到 flag ![api](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-API-1.png?raw=true)
+
+## 图片上传漏洞
+
+- 这题被搅屎了
+- 漏洞的话参考 [ImageMagick 命令执行分析](https://www.2cto.com/article/201605/505823.html)
+
+## phpinfo
+
